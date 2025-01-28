@@ -5,9 +5,9 @@ function interpretCommand(command) {
     
     // Handle the "set" command
     if (command.startsWith("set")) {
-        let parts = command.split("=");
+        const parts = command.split("=");
         if (parts.length === 2) {
-            let varName = parts[0].replace("set", "").trim(); // Extract variable name
+            const varName = parts[0].replace("set", "").trim(); // Extract variable name
             let value = parts[1].trim(); // Extract value
             
             // Try to convert value to number if possible
@@ -22,20 +22,9 @@ function interpretCommand(command) {
             outputElement.textContent += `Error: Invalid 'set' command format.\n`;
         }
     } 
-    // Handle the "store input as" command
-    else if (command.startsWith("store input as")) {
-        let varName = command.split(" ").pop();
-        let userInput = prompt(`Enter a value for ${varName}:`);
-        if (!isNaN(userInput)) {
-            userInput = parseFloat(userInput);
-        }
-        // Define the variable
-        variables[varName] = userInput;
-        outputElement.textContent += `Stored input for '${varName}' with value ${userInput}\n`;
-    } 
     // Handle the "output" command
     else if (command.startsWith("output")) {
-        let varName = command.split(" ").pop();
+        const varName = command.split(" ")[1];
         if (variables.hasOwnProperty(varName)) {
             outputElement.textContent += `The value of ${varName} is: ${variables[varName]}\n`;
         } else {
@@ -44,19 +33,19 @@ function interpretCommand(command) {
     } 
     // Handle arithmetic and assignment
     else if (command.includes(" = ") && !command.startsWith("set")) {
-        let [varName, expression] = command.split(" = ");
-        varName = varName.trim();
-        expression = expression.trim();
+        const [varName, expression] = command.split(" = ");
+        const trimmedVarName = varName.trim();
+        let trimmedExpression = expression.trim();
 
         // Replace variable names in the expression with their values
-        for (let key in variables) {
-            expression = expression.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
+        for (const key in variables) {
+            trimmedExpression = trimmedExpression.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
         }
 
         try {
             // Define and assign the variable
-            variables[varName] = eval(expression);
-            outputElement.textContent += `Set variable '${varName}' to ${variables[varName]}\n`;
+            variables[trimmedVarName] = eval(trimmedExpression);
+            outputElement.textContent += `Set variable '${trimmedVarName}' to ${variables[trimmedVarName]}\n`;
         } catch (e) {
             outputElement.textContent += `Error evaluating expression: ${e}\n`;
         }
@@ -72,6 +61,8 @@ function runInterpreter() {
     document.getElementById('output').textContent = ""; // Clear previous output
 
     commands.forEach(command => {
-        interpretCommand(command.trim());
+        if (command.trim() !== "") {
+            interpretCommand(command.trim());
+        }
     });
 }
