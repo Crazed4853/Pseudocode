@@ -35,7 +35,7 @@ function interpretCommand(command) {
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
 
-    // Handle the "store user input as" command
+    // Handle the "store input as" command
     else if (command.startsWith("store input as")) {
         const varName = parts[-1]; // Extract the variable name
         const userInput = prompt(`Enter a value for ${varName}:`); // Prompt the user for input
@@ -47,6 +47,41 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
+    // Handle the "if" condition
+    else if (command.startsWith("if")) {
+        const condition = command.substring(2).trim(); // Extract the condition
+        let evaluatedCondition;
+
+        try {
+            // Replace variable names in the condition with their values
+            let conditionWithValues = condition;
+            for (const key in variables) {
+                conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
+            }
+
+            // Evaluate the condition
+            evaluatedCondition = eval(conditionWithValues);
+
+            // Set the skipExecution flag based on the condition
+            skipExecution = !evaluatedCondition;
+
+            outputElement.textContent += `Evaluating condition: ${conditionWithValues} -> ${evaluatedCondition}\n`;
+        } catch (e) {
+            outputElement.textContent += `Error evaluating condition: ${e.message}\n`;
+            skipExecution = true; // Skip execution if the condition fails to evaluate
+        }
+    }
+    // Handle the "else" command
+    else if (command.startsWith("else")) {
+        // Flip the skipExecution flag since we're in the else block
+        skipExecution = !skipExecution;
+    }
+    // Handle the "end" command
+    else if (command.startsWith("end")) {
+        // Reset skipExecution flag when exiting a block
+        skipExecution = false;
+    }
+        
     // Handle the "output" command
     else if (command.startsWith("output")) {
         const argument = command.substring(7).trim(); // Extract the argument after "output"
