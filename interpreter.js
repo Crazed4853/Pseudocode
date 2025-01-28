@@ -22,16 +22,22 @@ function interpretCommand(command) {
             outputElement.textContent += `Error: Invalid 'set' command format. Use 'set <variable> = <value>'.\n`;
         }
     } 
-    else if command.startswith("store input as"): {
-        var_name = parts[-1]
-        user_input = input(f"Enter a value for {var_name}: ")
-        try:
-            user_input = int(user_input)  # Convert to integer if possible
-        except ValueError:
-            pass  # Keep as string if conversion fails
-        variables[varName] = user_input
+    else if (command.startsWith("store input as")) {
+        const varName = parts[-1]
+        const userInput = prompt(`Enter a value for ${varName}:`); // Prompt the user for input
+        
+        // Convert input to a number if possible, otherwise store it as a string
+        const value = isNaN(userInput) ? userInput : parseFloat(userInput);
+        
+        // Initialize the variable if it doesn't exist
+        if (!variables.hasOwnProperty(varName)) {
+            outputElement.textContent += `Initialized variable '${varName}'\n`;
+        }
+        
+        // Store the input value in the variable
+        variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
-    }   
+    } 
     // Handle the "store user input as" command
     else if (command.startsWith("store user input as")) {
         const varName = parts[-1]
