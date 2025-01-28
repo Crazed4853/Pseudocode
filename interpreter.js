@@ -106,6 +106,8 @@ function interpretCommand(command) {
         
     // Handle the "output" command
     else if (command.startsWith("output")) {
+        if (skipExecution) return; // Skip execution if inside an inactive block
+
         const argument = command.substring(7).trim(); // Extract the argument after "output"
 
         try {
@@ -116,7 +118,7 @@ function interpretCommand(command) {
             const outputMessage = components
                 .map(part => {
                     if (part.startsWith('"') && part.endsWith('"')) {
-                        // If it's a string literal, return it as-is without processing variables inside
+                        // If it's a string literal, treat it as-is
                         return part.slice(1, -1); // Remove quotes but preserve content
                     } else if (variables.hasOwnProperty(part)) {
                         // If it's a variable, replace it with its value
