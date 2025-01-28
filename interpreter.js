@@ -1,11 +1,11 @@
 let variables = {}; // Dictionary to store variables
-let skipExecution = false; // Flag to handle skipping commands in inactive blocks
+let skipExecution = false; // Flag to handle skipping commands
 let blockStack = []; // Stack to track block states (if-else logic)
 
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
 
-    // Check if we're skipping execution due to a false condition
+    // Handle skipping commands due to an inactive block
     if (skipExecution && !command.startsWith("else") && !command.startsWith("end")) {
         return; // Skip this command if inside an inactive block
     }
@@ -41,6 +41,7 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
+
      // Handle the "store input as" command
     else if (command.startsWith("store input as")) {
         const varName = parts[-1]; // Extract the variable name
@@ -69,7 +70,7 @@ function interpretCommand(command) {
             evaluatedCondition = eval(conditionWithValues);
 
             // Push the result to the block stack
-            blockStack.push(evaluatedCondition);
+            blockStack.push({ type: "if", condition: evaluatedCondition });
 
             // Set the skipExecution flag based on the condition
             skipExecution = !evaluatedCondition;
@@ -78,20 +79,26 @@ function interpretCommand(command) {
         } catch (e) {
             outputElement.textContent += `Error evaluating condition: ${e.message}\n`;
             skipExecution = true; // Skip execution if the condition fails to evaluate
-            blockStack.push(false); // Push a "false" block to ensure proper tracking
+            blockStack.push({ type: "if", condition: false }); // Push a "false" block to ensure proper tracking
         }
     }
     // Handle the "else" command
     else if (command.startsWith("else")) {
-        if (blockStack.length === 0) {
+        if (blockStack.length === 0 || blockStack[blockStack.length - 1].type !== "if") {
             outputElement.textContent += `Error: 'else' without matching 'if'.\n`;
             return;
         }
 
-        // Flip the skipExecution flag for the else block
-        const lastCondition = blockStack.pop();
-        blockStack.push(!lastCondition); // Flip the logic for the else block
-        skipExecution = lastCondition; // Update skipExecution based on the flipped condition
+        const lastBlock = blockStack[blockStack.length - 1];
+        if (lastBlock.condition) {
+            // If the 'if' condition was true, skip the 'else' block
+            skipExecution = true;
+        } else {
+            // If the 'if' condition was false, execute the 'else' block
+            skipExecution = false;
+        }
+        // Update the block type to "else"
+        lastBlock.type = "else";
     }
     // Handle the "end" command
     else if (command.startsWith("end")) {
@@ -100,11 +107,11 @@ function interpretCommand(command) {
             return;
         }
 
-        // Pop the last condition from the block stack
+        // Pop the last block from the stack
         blockStack.pop();
 
-        // Update skipExecution based on the remaining stack
-        skipExecution = blockStack.some(condition => !condition);
+        // Reset the skipExecution flag based on the remaining blocks
+        skipExecution = blockStack.some(block => !block.condition);
     }
     // Handle the "output" command
     else if (command.startsWith("output")) {
