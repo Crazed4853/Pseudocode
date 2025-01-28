@@ -2,7 +2,10 @@ let variables = {}; // Dictionary to store variables
 
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
-
+    // Check if we're skipping execution due to a false condition
+    if (skipExecution && !command.startsWith("else") && !command.startsWith("end")) {
+        return; // Skip this command if inside an inactive block
+    }
     // Handle the "set" command
     if (command.startsWith("set")) {
         const parts = command.split("=");
@@ -62,6 +65,9 @@ function interpretCommand(command) {
             // Evaluate the condition
             evaluatedCondition = eval(conditionWithValues);
 
+            // Push the result to the block stack
+            blockStack.push(evaluatedCondition);
+
             // Set the skipExecution flag based on the condition
             skipExecution = !evaluatedCondition;
 
@@ -69,17 +75,33 @@ function interpretCommand(command) {
         } catch (e) {
             outputElement.textContent += `Error evaluating condition: ${e.message}\n`;
             skipExecution = true; // Skip execution if the condition fails to evaluate
+            blockStack.push(false); // Push a "false" block to ensure proper tracking
         }
     }
     // Handle the "else" command
     else if (command.startsWith("else")) {
-        // Flip the skipExecution flag since we're in the else block
-        skipExecution = !skipExecution;
+        if (blockStack.length === 0) {
+            outputElement.textContent += `Error: 'else' without matching 'if'.\n`;
+            return;
+        }
+
+        // Flip the skipExecution flag for the else block
+        const lastCondition = blockStack.pop();
+        blockStack.push(!lastCondition); // Flip the logic for the else block
+        skipExecution = lastCondition; // Update skipExecution based on the flipped condition
     }
     // Handle the "end" command
     else if (command.startsWith("end")) {
-        // Reset skipExecution flag when exiting a block
-        skipExecution = false;
+        if (blockStack.length === 0) {
+            outputElement.textContent += `Error: 'end' without matching 'if'.\n`;
+            return;
+        }
+
+        // Pop the last condition from the block stack
+        blockStack.pop();
+
+        // Update skipExecution based on the remaining stack
+        skipExecution = blockStack.some(condition => !condition);
     }
         
     // Handle the "output" command
