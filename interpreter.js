@@ -1,9 +1,28 @@
-let variables = {};
+let variables = {}; // Dictionary to store variables
 
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
     
-    if (command.startsWith("store input as")) {
+    // Handle the "set" command
+    if (command.startsWith("set")) {
+        let parts = command.split("=");
+        if (parts.length === 2) {
+            let varName = parts[0].replace("set", "").trim(); // Extract variable name
+            let value = parts[1].trim(); // Extract value
+            
+            // Try to convert value to number if possible
+            if (!isNaN(value)) {
+                value = parseFloat(value);
+            }
+            
+            variables[varName] = value; // Store the variable
+            outputElement.textContent += `Set variable '${varName}' to ${value}\n`;
+        } else {
+            outputElement.textContent += `Error: Invalid 'set' command format.\n`;
+        }
+    } 
+    // Handle the "store input as" command
+    else if (command.startsWith("store input as")) {
         let varName = command.split(" ").pop();
         let userInput = prompt(`Enter a value for ${varName}:`);
         if (!isNaN(userInput)) {
@@ -11,40 +30,8 @@ function interpretCommand(command) {
         }
         variables[varName] = userInput;
     } 
+    // Handle the "output" command
     else if (command.startsWith("output")) {
         let varName = command.split(" ").pop();
         if (variables.hasOwnProperty(varName)) {
-            outputElement.textContent += `The value of ${varName} is: ${variables[varName]}\n`;
-        } else {
-            outputElement.textContent += `Error: Variable '${varName}' not defined.\n`;
-        }
-    } 
-    else if (command.includes(" = ")) {
-        let [varName, expression] = command.split(" = ");
-        varName = varName.trim();
-        expression = expression.trim();
-
-        for (let key in variables) {
-            expression = expression.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
-        }
-
-        try {
-            variables[varName] = eval(expression);
-        } catch (e) {
-            outputElement.textContent += `Error evaluating expression: ${e}\n`;
-        }
-    } 
-    else {
-        outputElement.textContent += `Unknown command: ${command}\n`;
-    }
-}
-
-function runInterpreter() {
-    const pseudocodeInput = document.getElementById('pseudocodeInput').value;
-    const commands = pseudocodeInput.split("\n");
-    document.getElementById('output').textContent = "";  // Clear previous output
-
-    commands.forEach(command => {
-        interpretCommand(command.trim());
-    });
-}
+            outputElement.textContent += `The value of
