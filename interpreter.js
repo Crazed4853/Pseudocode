@@ -2,60 +2,39 @@ let variables = {}; // Dictionary to store variables
 
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
-    
+
     // Handle the "set" command
     if (command.startsWith("set")) {
         const parts = command.split("=");
         if (parts.length === 2) {
             const varName = parts[0].replace("set", "").trim(); // Extract variable name
             let value = parts[1].trim(); // Extract value
-            
+
             // Try to convert value to a number if possible
             if (!isNaN(value)) {
                 value = parseFloat(value);
             }
-            
+
             // Define and initialize the variable
             variables[varName] = value;
-            outputElement.textContent += `Defined variable '${varName}' and set it to ${value}\n`;
+            outputElement.textContent += `Set variable '${varName}' to ${value}\n`;
         } else {
             outputElement.textContent += `Error: Invalid 'set' command format. Use 'set <variable> = <value>'.\n`;
         }
-    } 
-    else if (command.startsWith("store input as")) {
-        const varName = parts[-1]
-        const userInput = prompt(`Enter a value for ${varName}:`); // Prompt the user for input
-        
-        // Convert input to a number if possible, otherwise store it as a string
-        const value = isNaN(userInput) ? userInput : parseFloat(userInput);
-        
-        // Initialize the variable if it doesn't exist
-        if (!variables.hasOwnProperty(varName)) {
-            outputElement.textContent += `Initialized variable '${varName}'\n`;
-        }
-        
-        // Store the input value in the variable
-        variables[varName] = value;
-        outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
-    } 
+    }
     // Handle the "store user input as" command
     else if (command.startsWith("store user input as")) {
-        const varName = parts[-1]
+        const varName = command.split(" ").pop(); // Extract the variable name
         const userInput = prompt(`Enter a value for ${varName}:`); // Prompt the user for input
-        
+
         // Convert input to a number if possible, otherwise store it as a string
         const value = isNaN(userInput) ? userInput : parseFloat(userInput);
-        
-        // Initialize the variable if it doesn't exist
-        if (!variables.hasOwnProperty(varName)) {
-            outputElement.textContent += `Initialized variable '${varName}'\n`;
-        }
-        
+
         // Store the input value in the variable
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
-    } 
-       // Handle the "output" command
+    }
+    // Handle the "output" command
     else if (command.startsWith("output")) {
         const argument = command.substring(7).trim(); // Extract the argument after "output"
 
@@ -67,13 +46,13 @@ function interpretCommand(command) {
             const outputMessage = components
                 .map(part => {
                     if (part.startsWith('"') && part.endsWith('"')) {
-                        // If it's a string literal, treat it as a literal string and return it without modification
-                        return part.slice(1, -1);
+                        // If it's a string literal, return it as-is without processing variables inside
+                        return part.slice(1, -1); // Remove quotes but preserve content
                     } else if (variables.hasOwnProperty(part)) {
                         // If it's a variable, replace it with its value
                         return variables[part];
                     } else {
-                        // If it's neither a variable nor a string literal, it's invalid
+                        // If it's neither a variable nor a string literal, throw an error
                         throw new Error(`Variable '${part}' not defined or invalid format.`);
                     }
                 })
@@ -103,8 +82,7 @@ function interpretCommand(command) {
         } catch (e) {
             outputElement.textContent += `Error evaluating expression: ${e}\n`;
         }
-    } 
-    else {
+    } else {
         outputElement.textContent += `Unknown command: ${command}\n`;
     }
 }
