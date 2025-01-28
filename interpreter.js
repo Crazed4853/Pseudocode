@@ -55,7 +55,7 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     } 
-     // Handle the "output" command with commas for mixed strings and variables
+   // Handle the "output" command
     else if (command.startsWith("output")) {
         const argument = command.substring(7).trim(); // Extract the argument after "output"
 
@@ -67,13 +67,13 @@ function interpretCommand(command) {
             const outputMessage = components
                 .map(part => {
                     if (part.startsWith('"') && part.endsWith('"')) {
-                        // If it's a string, remove the surrounding quotes
+                        // If it's a string literal, remove the surrounding quotes
                         return part.slice(1, -1);
                     } else if (variables.hasOwnProperty(part)) {
                         // If it's a variable, replace it with its value
                         return variables[part];
                     } else {
-                        // Otherwise, return the part as-is
+                        // If it's neither a variable nor a string literal, it's invalid
                         throw new Error(`Variable '${part}' not defined or invalid format.`);
                     }
                 })
