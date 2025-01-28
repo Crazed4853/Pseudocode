@@ -57,28 +57,24 @@ function interpretCommand(command) {
     } 
     // Handle the "output" command with combined strings and variables
     else if (command.startsWith("output")) {
-        const argument = command.substring(7).trim(); // Extract the argument after "output"
+        let argument = command.substring(7).trim(); // Extract the argument after "output"
 
         try {
-            let outputMessage = argument;
-
-            // Replace variables in the argument with their values
+            // Replace variables with their values in the argument
             for (const [varName, value] of Object.entries(variables)) {
                 const varPattern = new RegExp(`\\b${varName}\\b`, "g"); // Match whole variable names
-                outputMessage = outputMessage.replace(varPattern, value);
+                argument = argument.replace(varPattern, value);
             }
 
-            // Evaluate and process combined string/variable outputs
-            if (outputMessage.includes('"')) {
-                outputMessage = eval(outputMessage); // Process expressions with strings and variables
-            }
+            // Evaluate the argument to handle concatenations (e.g., "string" + variable)
+            argument = eval(argument); // Handles string concatenation and mixed content
 
             // Print the final combined output
-            outputElement.textContent += `${outputMessage}\n`;
+            outputElement.textContent += `${argument}\n`;
         } catch (e) {
             outputElement.textContent += `Error processing output: ${e}\n`;
         }
-    } 
+    }
     // Handle arithmetic and assignment
     else if (command.includes(" = ") && !command.startsWith("set")) {
         const [varName, expression] = command.split(" = ");
