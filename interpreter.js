@@ -2,18 +2,6 @@ let variables = {}; // Dictionary to store variables
 let skipExecution = false; // Flag to handle skipping commands
 let blockStack = []; // Stack to track block states (if-else logic)
 
-function loadSampleCode() {
-            const sampleCode = `amount = 0
-interest = 0
-output "Enter initial amount."
-store user input as amount
-output "Enter the simple interest rate as a percentage."
-store user input as interest
-finalAmount = amount + (amount * interest / 100 * 5)
-output "The final amount at the end of 5 years is ", finalAmount, "."`;
-document.getElementById('pseudocodeInput').value = sampleCode;
-    }
-
 
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
