@@ -36,6 +36,7 @@ function interpretCommand(command) {
     // Handle the "output" command
     else if (command.startsWith("output")) {
         const argument = command.substring(7).trim(); // Extract the argument after "output"
+
         if (argument.startsWith('"') && argument.endsWith('"')) {
             // Print a string literal
             const message = argument.slice(1, -1); // Remove surrounding quotes
