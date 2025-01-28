@@ -23,7 +23,7 @@ function interpretCommand(command) {
         }
     } 
     // Handle the "store input as" command
-    else if (command.startsWith("store input as")) {
+    else if (command.startsWith("store user input as")) {
         let varName = command.split(" ").pop();
         let userInput = prompt(`Enter a value for ${varName}:`);
         if (!isNaN(userInput)) {
