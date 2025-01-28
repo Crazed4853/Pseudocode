@@ -1,11 +1,15 @@
 let variables = {}; // Dictionary to store variables
+let skipExecution = false; // Flag to handle skipping commands in inactive blocks
+let blockStack = []; // Stack to track block states (if-else logic)
 
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
+
     // Check if we're skipping execution due to a false condition
     if (skipExecution && !command.startsWith("else") && !command.startsWith("end")) {
         return; // Skip this command if inside an inactive block
     }
+
     // Handle the "set" command
     if (command.startsWith("set")) {
         const parts = command.split("=");
@@ -37,8 +41,7 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
-
-    // Handle the "store input as" command
+     // Handle the "store input as" command
     else if (command.startsWith("store input as")) {
         const varName = parts[-1]; // Extract the variable name
         const userInput = prompt(`Enter a value for ${varName}:`); // Prompt the user for input
@@ -103,7 +106,6 @@ function interpretCommand(command) {
         // Update skipExecution based on the remaining stack
         skipExecution = blockStack.some(condition => !condition);
     }
-        
     // Handle the "output" command
     else if (command.startsWith("output")) {
         if (skipExecution) return; // Skip execution if inside an inactive block
@@ -138,6 +140,8 @@ function interpretCommand(command) {
     }
     // Handle arithmetic and assignment
     else if (command.includes(" = ") && !command.startsWith("set")) {
+        if (skipExecution) return; // Skip execution if inside an inactive block
+
         const [varName, expression] = command.split(" = ");
         const trimmedVarName = varName.trim();
         let trimmedExpression = expression.trim();
