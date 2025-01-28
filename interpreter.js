@@ -7,7 +7,7 @@ function interpretCommand(command) {
     if (command.startsWith("set")) {
         const parts = command.split("=");
         if (parts.length === 2) {
-            const varName = parts[0].replace("set", "").trim(); // Extract variable name
+            const varName = parts[0].replace("set ", "").trim(); // Extract variable name
             let value = parts[1].trim(); // Extract value
             
             // Try to convert value to a number if possible
