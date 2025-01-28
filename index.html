@@ -32,7 +32,6 @@
 </head>
 <body>
     <h1>EQAO Grade 9 Pseudocode Interpreter</h1>
-    <button onclick="loadSampleCode()">Load Sample Code</button>
     <textarea id="pseudocodeInput" placeholder="Enter your pseudocode here..."></textarea>
     <button onclick="runInterpreter()">Run</button>
     <h2>Output:</h2>
@@ -51,17 +50,7 @@
     </div>
 
     <script src="interpreter.js"></script>
-    <script> function loadSampleCode() {
-            const sampleCode = `amount = 0
-interest = 0
-output "Enter initial amount."
-store user input as amount
-output "Enter the simple interest rate as a percentage."
-store user input as interest
-finalAmount = amount + (amount * interest / 100 * 5)
-output "The final amount at the end of 5 years is ", finalAmount, "."`;
-document.getElementById('pseudocodeInput').value = sampleCode;
-    }</script>
+
    
 </body>
 </html>
