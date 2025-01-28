@@ -22,13 +22,29 @@ function interpretCommand(command) {
             outputElement.textContent += `Error: Invalid 'set' command format. Use 'set <variable> = <value>'.\n`;
         }
     } 
+    // Handle the "store input as" command
+    else if (command.startsWith("store input as")) {
+        let varName = command.split(" ").pop();
+        let userInput = prompt(`Enter a value for ${varName}:`);
+        if (!isNaN(userInput)) {
+            userInput = parseFloat(userInput);
+        }
+        // Define the variable
+        variables[varName] = userInput;
+        outputElement.textContent += `Stored input for '${varName}' with value ${userInput}\n`;
+    } 
     // Handle the "output" command
     else if (command.startsWith("output")) {
-        const varName = command.split(" ")[1];
-        if (variables.hasOwnProperty(varName)) {
-            outputElement.textContent += `The value of ${varName} is: ${variables[varName]}\n`;
+        const argument = command.substring(7).trim(); // Extract the argument after "output"
+        if (argument.startsWith('"') && argument.endsWith('"')) {
+            // Print a string literal
+            const message = argument.slice(1, -1); // Remove surrounding quotes
+            outputElement.textContent += `${message}\n`;
+        } else if (variables.hasOwnProperty(argument)) {
+            // Print a variable's value
+            outputElement.textContent += `The value of ${argument} is: ${variables[argument]}\n`;
         } else {
-            outputElement.textContent += `Error: Variable '${varName}' not defined.\n`;
+            outputElement.textContent += `Error: Variable '${argument}' not defined or invalid format.\n`;
         }
     } 
     // Handle arithmetic and assignment
