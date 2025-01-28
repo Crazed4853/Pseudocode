@@ -28,6 +28,24 @@
         .glossary h2 {
             margin-top: 0;
         }
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        td pre {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -48,6 +66,106 @@
         <p><strong>end</strong>: Close an <strong>if</strong> or <strong>else</strong> block.</p>
         <p><strong>Arithmetic Expressions:</strong> Use standard arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>) in expressions to calculate values.</p>
     </div>
+
+        <h2>Sample Code Table</h2>
+    <table>
+        <tr>
+            <th>Sample 1</th>
+            <th>Sample 2</th>
+            <th>Sample 3</th>
+        </tr>
+        <tr>
+            <td>
+                <pre>
+set a = 5
+set b = 3
+result = a ^ b
+output "The result of ", a, " raised to ", b, " is ", result, "."
+                </pre>
+            </td>
+            <td>
+                <pre>
+set amount = 1000
+set rate = 5
+set years = 3
+finalAmount = amount + (amount * rate / 100 * years)
+output "The final amount is ", finalAmount, "."
+                </pre>
+            </td>
+            <td>
+                <pre>
+set score = 85
+if score >= 50
+    output "You passed with a score of ", score, "."
+else
+    output "You failed with a score of ", score, "."
+end
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <pre>
+store user input as base
+store user input as height
+area = 0.5 * base * height
+output "The area of the triangle is ", area, "."
+                </pre>
+            </td>
+            <td>
+                <pre>
+set x = 10
+set y = 20
+if x < y
+    output x, " is less than ", y, "."
+else
+    output x, " is not less than ", y, "."
+end
+                </pre>
+            </td>
+            <td>
+                <pre>
+set n = 5
+factorial = 1
+while n > 0
+    factorial = factorial * n
+    n = n - 1
+end
+output "The factorial is ", factorial, "."
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <pre>
+set num = 15
+if num % 2 == 0
+    output num, " is even."
+else
+    output num, " is odd."
+end
+                </pre>
+            </td>
+            <td>
+                <pre>
+store user input as radius
+pi = 3.14159
+area = pi * radius ^ 2
+output "The area of the circle is ", area, "."
+                </pre>
+            </td>
+            <td>
+                <pre>
+set temperature = 32
+if temperature >= 30
+    output "It's hot today!"
+else
+    output "It's cool today."
+end
+                </pre>
+            </td>
+        </tr>
+    </table>
 
     <script src="interpreter.js"></script>
 
