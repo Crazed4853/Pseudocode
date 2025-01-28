@@ -55,7 +55,7 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     } 
-   // Handle the "output" command
+       // Handle the "output" command
     else if (command.startsWith("output")) {
         const argument = command.substring(7).trim(); // Extract the argument after "output"
 
@@ -67,7 +67,7 @@ function interpretCommand(command) {
             const outputMessage = components
                 .map(part => {
                     if (part.startsWith('"') && part.endsWith('"')) {
-                        // If it's a string literal, remove the surrounding quotes
+                        // If it's a string literal, treat it as a literal string and return it without modification
                         return part.slice(1, -1);
                     } else if (variables.hasOwnProperty(part)) {
                         // If it's a variable, replace it with its value
