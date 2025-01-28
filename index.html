@@ -23,8 +23,19 @@
     <h1>Pseudocode Interpreter</h1>
     <textarea id="pseudocodeInput" placeholder="Enter your pseudocode here..."></textarea>
     <button onclick="runInterpreter()">Run</button>
-    <h2>Output</h2>
+    <h2>Output:</h2>
     <pre id="output"></pre>
+
+    <div class="glossary">
+        <h2>Glossary of Commands</h2>
+        <p><strong>set &lt;variable&gt; = &lt;value&gt;</strong>: Define a variable and assign it a value.</p>
+        <p><strong>store user input as &lt;variable&gt;</strong>: Prompt the user to enter a value, then store it in the specified variable.</p>
+        <p><strong>output &lt;text&gt;, &lt;variable&gt;</strong>: Print a combination of text and variables. Text must be enclosed in double quotes ("").</p>
+        <p><strong>if &lt;condition&gt;</strong>: Start a conditional block. The block executes only if the condition evaluates to true.</p>
+        <p><strong>else</strong>: Define an alternate block to execute if the preceding <strong>if</strong> condition is false.</p>
+        <p><strong>end</strong>: Close an <strong>if</strong> or <strong>else</strong> block.</p>
+        <p><strong>Arithmetic Expressions:</strong> Use standard arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>) in expressions to calculate values.</p>
+    </div>
 
     <script src="interpreter.js"></script>
 </body>
