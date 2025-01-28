@@ -55,19 +55,28 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     } 
-    // Handle the "output" command
+    // Handle the "output" command with combined strings and variables
     else if (command.startsWith("output")) {
         const argument = command.substring(7).trim(); // Extract the argument after "output"
 
-        if (argument.startsWith('"') && argument.endsWith('"')) {
-            // Print a string literal
-            const message = argument.slice(1, -1); // Remove surrounding quotes
-            outputElement.textContent += `${message}\n`;
-        } else if (variables.hasOwnProperty(argument)) {
-            // Print a variable's value
-            outputElement.textContent += `The value of ${argument} is: ${variables[argument]}\n`;
-        } else {
-            outputElement.textContent += `Error: Variable '${argument}' not defined or invalid format.\n`;
+        try {
+            let outputMessage = argument;
+
+            // Replace variables in the argument with their values
+            for (const [varName, value] of Object.entries(variables)) {
+                const varPattern = new RegExp(`\\b${varName}\\b`, "g"); // Match whole variable names
+                outputMessage = outputMessage.replace(varPattern, value);
+            }
+
+            // Evaluate and process combined string/variable outputs
+            if (outputMessage.includes('"')) {
+                outputMessage = eval(outputMessage); // Process expressions with strings and variables
+            }
+
+            // Print the final combined output
+            outputElement.textContent += `${outputMessage}\n`;
+        } catch (e) {
+            outputElement.textContent += `Error processing output: ${e}\n`;
         }
     } 
     // Handle arithmetic and assignment
