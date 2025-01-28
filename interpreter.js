@@ -10,7 +10,7 @@ function interpretCommand(command) {
             const varName = parts[0].replace("set", "").trim(); // Extract variable name
             let value = parts[1].trim(); // Extract value
             
-            // Try to convert value to number if possible
+            // Try to convert value to a number if possible
             if (!isNaN(value)) {
                 value = parseFloat(value);
             }
@@ -19,7 +19,7 @@ function interpretCommand(command) {
             variables[varName] = value;
             outputElement.textContent += `Defined variable '${varName}' and set it to ${value}\n`;
         } else {
-            outputElement.textContent += `Error: Invalid 'set' command format.\n`;
+            outputElement.textContent += `Error: Invalid 'set' command format. Use 'set <variable> = <value>'.\n`;
         }
     } 
     // Handle the "output" command
