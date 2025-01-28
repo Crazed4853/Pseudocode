@@ -24,7 +24,20 @@ function interpretCommand(command) {
     }
     // Handle the "store user input as" command
     else if (command.startsWith("store user input as")) {
-        const varName = command.split(" ").pop(); // Extract the variable name
+        const varName = parts[-1]; // Extract the variable name
+        const userInput = prompt(`Enter a value for ${varName}:`); // Prompt the user for input
+
+        // Convert input to a number if possible, otherwise store it as a string
+        const value = isNaN(userInput) ? userInput : parseFloat(userInput);
+
+        // Store the input value in the variable
+        variables[varName] = value;
+        outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
+    }
+
+    // Handle the "store user input as" command
+    else if (command.startsWith("store input as")) {
+        const varName = parts[-1]; // Extract the variable name
         const userInput = prompt(`Enter a value for ${varName}:`); // Prompt the user for input
 
         // Convert input to a number if possible, otherwise store it as a string
