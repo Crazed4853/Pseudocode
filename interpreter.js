@@ -55,24 +55,34 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     } 
-    // Handle the "output" command with combined strings and variables
+     // Handle the "output" command with commas for mixed strings and variables
     else if (command.startsWith("output")) {
-        let argument = command.substring(7).trim(); // Extract the argument after "output"
+        const argument = command.substring(7).trim(); // Extract the argument after "output"
 
         try {
-            // Replace variables with their values in the argument
-            for (const [varName, value] of Object.entries(variables)) {
-                const varPattern = new RegExp(`\\b${varName}\\b`, "g"); // Match whole variable names
-                argument = argument.replace(varPattern, value);
-            }
+            // Split the argument by commas to handle multiple components
+            const components = argument.split(",").map(component => component.trim());
 
-            // Evaluate the argument to handle concatenations (e.g., "string" + variable)
-            argument = eval(argument); // Handles string concatenation and mixed content
+            // Process each component
+            const outputMessage = components
+                .map(part => {
+                    if (part.startsWith('"') && part.endsWith('"')) {
+                        // If it's a string, remove the surrounding quotes
+                        return part.slice(1, -1);
+                    } else if (variables.hasOwnProperty(part)) {
+                        // If it's a variable, replace it with its value
+                        return variables[part];
+                    } else {
+                        // Otherwise, return the part as-is
+                        throw new Error(`Variable '${part}' not defined or invalid format.`);
+                    }
+                })
+                .join(""); // Combine all components into a single string
 
             // Print the final combined output
-            outputElement.textContent += `${argument}\n`;
+            outputElement.textContent += `${outputMessage}\n`;
         } catch (e) {
-            outputElement.textContent += `Error processing output: ${e}\n`;
+            outputElement.textContent += `Error processing output: ${e.message}\n`;
         }
     }
     // Handle arithmetic and assignment
