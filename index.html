@@ -95,13 +95,17 @@ output stepTwo
         <tr>
             <td>
                 <pre>
-set numberOfPlayers = 0
-set fullScore = 0
-output "How many players played in the game?"
-store user input as numberOfPlayers    
-output "How many points were scored in the game?"
-store user input as fullScore    
-variable =  fullScore  / numberOfPlayers
+rateOfChange = -4
+initialValue = 12
+output "Enter the x-coordinate of the point."
+store user input as xInput
+output "Enter the y-coordinate of the point."
+store user input as yInput
+yValue = rateOfChange * xInput + initialValue
+if yInput > yValue
+output "The point is above the line"
+else
+output "The point is not above the line."
                 </pre>
             </td>
                </tr>
@@ -128,17 +132,7 @@ output "The value of variable A is ", variableA, "."
         <tr>
             <td>
                 <pre>
-rateOfChange = -4
-initialValue = 12
-output "Enter the x-coordinate of the point."
-store user input as xInput
-output "Enter the y-coordinate of the point."
-store user input as yInput
-yValue = rateOfChange * xInput + initialValue
-if yInput > yValue
-output "The point is above the line"
-else
-output "The point is not above the line."
+
                 </pre>
             </td>       
         </tr>
@@ -146,14 +140,7 @@ output "The point is not above the line."
         <tr>
             <td>
                 <pre>
-amount = 0     
-interest = 0
-output "Enter initial amount."
-store user input as amount
-output "Enter the simple interest rate as a percentage."
-store user input as interest
-finalAmount = amount + (amount * interest/100 * 5)
-output "The final amount at the end of 5 years is ", finalAmount, "."
+
                 </pre>
             </td>
         </tr>
