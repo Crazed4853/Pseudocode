@@ -127,12 +127,19 @@ output "The value of variable A is ", variableA, "."
             </td>
         </tr>
         <tr>
-            <th>Sample 4</th>
+            <th>Sample 4 (2024-2025 Sample Test)</th>
            </tr>
         <tr>
             <td>
                 <pre>
-
+amount = 0
+interest = 0
+output "Enter initial amount."
+store user input as amount
+output "Enter the simple interest rate as a percentage."
+store user input as interest
+finalAmount = amount + (amount * interest/100 * 5)
+output "The final amount at the end of 5 years ", finalAmount, "."
                 </pre>
             </td>       
         </tr>
