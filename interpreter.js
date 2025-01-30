@@ -56,55 +56,31 @@ function interpretCommand(command) {
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
     // Handle loops (repeat loop until <condition>)
-    else if (command.startsWith("repeat loop")) {
-        let loopInfo = command.replace("repeat loop", "").trim();
-    
-        if (loopInfo.startsWith("until")) {
-            // Conditional loop (repeat until condition is met)
-            let condition = loopInfo.replace("until", "").trim();
-            loopStack.push({ type: "until", condition, commands: [] });
-        } else {
-            // Check if loop uses explicit iterations
-            let match = loopInfo.match(/^(\d+)\s+times$/);
-            if (match) {
-                let iterations = parseInt(match[1], 10);
-                loopStack.push({ type: "times", iterations, commands: [] });
-            } else {
-                outputElement.textContent += `Error: Invalid loop syntax.\n`;
-            }
-        }
+    else if (command.startsWith("repeat loop until")) {
+        const condition = command.replace("repeat loop until", "").trim();
+        loopStack.push({ condition, commands: [] });
     }
     // Handle end of loop
     else if (command.startsWith("end loop")) {
         if (loopStack.length === 0) {
-            outputElement.textContent += `Error: 'end loop' without matching 'repeat loop'.\n`;
+            outputElement.textContent += `Error: 'end loop' without matching 'repeat loop until'.\n`;
             return;
         }
-    
-        let loop = loopStack.pop();
-    
-        if (loop.type === "until") {
-            while (true) {
-                let conditionWithValues = loop.condition;
-                for (const key in variables) {
-                    conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
-                }
-    
-                if (eval(conditionWithValues)) break;
-                loop.commands.forEach(cmd => interpretCommand(cmd));
+
+        const loop = loopStack.pop();
+
+        while (true) {
+            // Replace variable names in the condition with their values
+            let conditionWithValues = loop.condition;
+            for (const key in variables) {
+                conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
             }
-        } else if (loop.type === "times") {
-            // Ensuring `counter` variable is reset on each loop
-            let prevCounter = variables.hasOwnProperty("counter") ? variables["counter"] : undefined;
-            for (let i = 1; i <= loop.iterations; i++) {
-                variables["counter"] = i; // Store loop counter variable
-                loop.commands.forEach(cmd => interpretCommand(cmd));
-            }
-            if (prevCounter !== undefined) {
-                variables["counter"] = prevCounter; // Restore counter if it existed before
-            } else {
-                delete variables["counter"]; // Remove if it didn't exist before
-            }
+
+            // Evaluate the condition
+            if (eval(conditionWithValues)) break; // Stop the loop when the condition is true
+
+            // Execute the loop body
+            loop.commands.forEach(cmd => interpretCommand(cmd));
         }
     }
     // Store commands inside the loop
@@ -215,12 +191,8 @@ function interpretCommand(command) {
         for (const key in variables) {
             trimmedExpression = trimmedExpression.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
         }
-        // Replace `^` with `Math.pow` syntax
-        // trimmedExpression = trimmedExpression.replace(/(\d+|\w+)\s*\^\s*(\d+|\w+)/g, (_, base, exponent) => `Math.pow(${base}, ${exponent})`);
-        // **NEW REGEX**: Handles **negative & decimal exponents**
-        trimmedExpression = trimmedExpression.replace(/(-?\d+(\.\d+)?|\w+)\s*\^\s*(-?\d+(\.\d+)?|\w+)/g, (_, base, _, exponent) => {
-            return `Math.pow(${base}, ${exponent})`;
-        });
+         // Replace `^` with `Math.pow` syntax
+        trimmedExpression = trimmedExpression.replace(/(\d+|\w+)\s*\^\s*(\d+|\w+)/g, (_, base, exponent) => `Math.pow(${base}, ${exponent})`);
 
         try {
             // Define and assign the variable
