@@ -141,15 +141,15 @@ function interpretCommand(command) {
     }
 
     // Handle "end"
-    else if (command.startsWith("end")) {
-        if (blockStack.length === 0) {
-            outputElement.textContent += `Error: 'end' without matching 'if'.\n`;
-            return;
-        }
+    //else if (command.startsWith("end")) {
+    //    if (blockStack.length === 0) {
+    //        outputElement.textContent += `Error: 'end' without matching 'if'.\n`;
+    //        return;
+    //    }
 
-        blockStack.pop();
-        skipExecution = blockStack.some(block => !block.condition);
-    }
+    //    blockStack.pop();
+    //    skipExecution = blockStack.some(block => !block.condition);
+    //}
 
     // Handle "output"
     else if (command.startsWith("output")) {
