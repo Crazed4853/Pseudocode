@@ -6,7 +6,7 @@ let loopStack = [];
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
 
-    if (skipExecution && !command.startsWith("else") && !command.startsWith("end")) {
+    if (skipExecution && !command.startsWith("else")) {
         return;
     }
 
