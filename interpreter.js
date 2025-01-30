@@ -1,7 +1,7 @@
 let variables = {}; // Dictionary to store variables
 let skipExecution = false; // Flag to handle skipping commands
 let blockStack = []; // Stack to track block states (if-else logic)
-
+let loopStack = []; // Stack to store loop commands
 
 function interpretCommand(command) {
     const outputElement = document.getElementById('output');
@@ -55,6 +55,39 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
+    // Handle loops (repeat loop until <condition>)
+    else if (command.startsWith("repeat loop until")) {
+        const condition = command.replace("repeat loop until", "").trim();
+        loopStack.push({ condition, commands: [] });
+    }
+    // Handle end of loop
+    else if (command.startsWith("end loop")) {
+        if (loopStack.length === 0) {
+            outputElement.textContent += `Error: 'end loop' without matching 'repeat loop until'.\n`;
+            return;
+        }
+
+        const loop = loopStack.pop();
+
+        while (true) {
+            // Replace variable names in the condition with their values
+            let conditionWithValues = loop.condition;
+            for (const key in variables) {
+                conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
+            }
+
+            // Evaluate the condition
+            if (eval(conditionWithValues)) break; // Stop the loop when the condition is true
+
+            // Execute the loop body
+            loop.commands.forEach(cmd => interpretCommand(cmd));
+        }
+    }
+    // Store commands inside the loop
+    else if (loopStack.length > 0) {
+        loopStack[loopStack.length - 1].commands.push(command);
+    }
+        
     // Handle the "if" condition
     else if (command.startsWith("if")) {
         const condition = command.substring(2).trim(); // Extract the condition
