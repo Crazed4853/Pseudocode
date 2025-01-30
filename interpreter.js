@@ -37,6 +37,7 @@ function interpretCommand(command) {
         variables[varName] = value;
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
+     // Handle "store input as" command
     else if (command.startsWith("store input as")) {
         let varName = command.split(" ").pop();
         let userInput = window.prompt(`Enter a value for ${varName}:`);
@@ -48,51 +49,56 @@ function interpretCommand(command) {
     // Handle loops (repeat loop until <condition> or repeat loop <N> times)
     else if (command.startsWith("repeat loop")) {
         let loopInfo = command.replace("repeat loop", "").trim();
-
+    
         if (loopInfo.startsWith("until")) {
+            // Conditional loop (repeat until condition is met)
             let condition = loopInfo.replace("until", "").trim();
             loopStack.push({ type: "until", condition, commands: [] });
         } else {
-            let match = loopInfo.match(/^(\d+)\s+times$/);
+            // Fix: Allow spaces before "times"
+            let match = loopInfo.match(/^(\d+)\s*times$/);
             if (match) {
                 let iterations = parseInt(match[1], 10);
                 loopStack.push({ type: "times", iterations, commands: [] });
             } else {
-                outputElement.textContent += `Error: Invalid loop syntax.\n`;
+                outputElement.textContent += `Error: Invalid loop syntax: '${command}'.\n`;
             }
         }
     }
+
     // Handle end of loop
     else if (command.startsWith("end loop")) {
         if (loopStack.length === 0) {
             outputElement.textContent += `Error: 'end loop' without matching 'repeat loop'.\n`;
             return;
         }
-
+    
         let loop = loopStack.pop();
-
+    
         if (loop.type === "until") {
             while (true) {
                 let conditionWithValues = loop.condition;
                 for (const key in variables) {
                     conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
                 }
-
+    
                 if (eval(conditionWithValues)) break;
                 for (let cmd of loop.commands) {
                     interpretCommand(cmd);
                 }
             }
         } else if (loop.type === "times") {
+            // ✅ Ensure "counter" is always defined before execution
             let prevCounter = variables.hasOwnProperty("counter") ? variables["counter"] : undefined;
-
+    
             for (let i = 1; i <= loop.iterations; i++) {
-                variables["counter"] = i;
+                variables["counter"] = i; // Set "counter" variable for each loop iteration
                 for (let cmd of loop.commands) {
                     interpretCommand(cmd);
                 }
             }
-
+    
+            // ✅ Restore "counter" to its previous value or delete it
             if (prevCounter !== undefined) {
                 variables["counter"] = prevCounter;
             } else {
@@ -100,6 +106,7 @@ function interpretCommand(command) {
             }
         }
     }
+
     // Store commands inside the loop
     else if (loopStack.length > 0) {
         loopStack[loopStack.length - 1].commands.push(command);
