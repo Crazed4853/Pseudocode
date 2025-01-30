@@ -21,7 +21,7 @@ function interpretCommand(command) {
                 value = parseFloat(value);
             }
             variables[varName] = value;
-            outputElement.textContent += `Set variable '${varName}' to ${value}\n`;
+            // outputElement.textContent += `Set variable '${varName}' to ${value}\n`;
         } else {
             outputElement.textContent += `Error: Invalid 'set' command format.\n`;
         }
