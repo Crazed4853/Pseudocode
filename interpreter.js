@@ -183,7 +183,7 @@ function interpretCommand(command) {
         trimmedExpression = trimmedExpression.replace(/(\(.+?\)|-?\d+(\.\d+)?|\w+)\s*\^\s*(-?\d+(\.\d+)?|\w+)/g,  (match, base, _, exponent) => `Math.pow(${base}, ${exponent})`);
         try {
             variables[trimmedVarName] = eval(trimmedExpression);
-            outputElement.textContent += `Set variable '${trimmedVarName}' to ${variables[trimmedVarName]}\n`;
+            // outputElement.textContent += `Set variable '${trimmedVarName}' to ${variables[trimmedVarName]}\n`;
         } catch (e) {
             outputElement.textContent += `Error evaluating expression: ${e}\n`;
         }
