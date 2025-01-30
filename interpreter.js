@@ -63,18 +63,15 @@ function interpretCommand(command) {
             // Conditional loop (repeat until condition is met)
             let condition = loopInfo.replace("until", "").trim();
             loopStack.push({ type: "until", condition, commands: [] });
-        } else if (loopInfo.endsWith("times")) {
-            // Fixed iteration loop (repeat N times)
-            let iterations = parseInt(loopInfo.replace("times", "").trim(), 10);
-    
-            if (isNaN(iterations) || iterations < 1) {
-                outputElement.textContent += `Error: Invalid loop iteration count.\n`;
-                return;
-            }
-    
-            loopStack.push({ type: "times", iterations, commands: [] });
         } else {
-            outputElement.textContent += `Error: Invalid loop syntax.\n`;
+            // Check if loop uses explicit iterations
+            let match = loopInfo.match(/^(\d+)\s+times$/);
+            if (match) {
+                let iterations = parseInt(match[1], 10);
+                loopStack.push({ type: "times", iterations, commands: [] });
+            } else {
+                outputElement.textContent += `Error: Invalid loop syntax.\n`;
+            }
         }
     }
     // Handle end of loop
@@ -87,7 +84,6 @@ function interpretCommand(command) {
         let loop = loopStack.pop();
     
         if (loop.type === "until") {
-            // Conditional loop execution
             while (true) {
                 let conditionWithValues = loop.condition;
                 for (const key in variables) {
@@ -98,10 +94,16 @@ function interpretCommand(command) {
                 loop.commands.forEach(cmd => interpretCommand(cmd));
             }
         } else if (loop.type === "times") {
-            // Fixed iteration loop execution
+            // Ensuring `counter` variable is reset on each loop
+            let prevCounter = variables.hasOwnProperty("counter") ? variables["counter"] : undefined;
             for (let i = 1; i <= loop.iterations; i++) {
-                variables["counter"] = i; // Optionally store a counter
+                variables["counter"] = i; // Store loop counter variable
                 loop.commands.forEach(cmd => interpretCommand(cmd));
+            }
+            if (prevCounter !== undefined) {
+                variables["counter"] = prevCounter; // Restore counter if it existed before
+            } else {
+                delete variables["counter"]; // Remove if it didn't exist before
             }
         }
     }
