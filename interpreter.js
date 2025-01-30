@@ -197,6 +197,7 @@ function interpretCommand(command) {
         trimmedExpression = trimmedExpression.replace(/(-?\d+(\.\d+)?|\w+)\s*\^\s*(-?\d+(\.\d+)?|\w+)/g, (_, base, _, exponent) => {
             return `Math.pow(${base}, ${exponent})`;
         });
+
         try {
             // Define and assign the variable
             variables[trimmedVarName] = eval(trimmedExpression);
