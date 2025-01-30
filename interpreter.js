@@ -191,9 +191,12 @@ function interpretCommand(command) {
         for (const key in variables) {
             trimmedExpression = trimmedExpression.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
         }
-         // Replace `^` with `Math.pow` syntax
-        trimmedExpression = trimmedExpression.replace(/(\d+|\w+)\s*\^\s*(\d+|\w+)/g, (_, base, exponent) => `Math.pow(${base}, ${exponent})`);
-
+        // Replace `^` with `Math.pow` syntax
+        // trimmedExpression = trimmedExpression.replace(/(\d+|\w+)\s*\^\s*(\d+|\w+)/g, (_, base, exponent) => `Math.pow(${base}, ${exponent})`);
+        // **NEW REGEX**: Handles **negative & decimal exponents**
+        trimmedExpression = trimmedExpression.replace(/(-?\d+(\.\d+)?|\w+)\s*\^\s*(-?\d+(\.\d+)?|\w+)/g, (_, base, _, exponent) => {
+            return `Math.pow(${base}, ${exponent})`;
+        });
         try {
             // Define and assign the variable
             variables[trimmedVarName] = eval(trimmedExpression);
