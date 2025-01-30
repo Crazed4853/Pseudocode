@@ -56,31 +56,53 @@ function interpretCommand(command) {
         outputElement.textContent += `Stored input for '${varName}' with value ${value}\n`;
     }
     // Handle loops (repeat loop until <condition>)
-    else if (command.startsWith("repeat loop until")) {
-        const condition = command.replace("repeat loop until", "").trim();
-        loopStack.push({ condition, commands: [] });
+    else if (command.startsWith("repeat loop")) {
+        let loopInfo = command.replace("repeat loop", "").trim();
+    
+        if (loopInfo.startsWith("until")) {
+            // Conditional loop (repeat until condition is met)
+            let condition = loopInfo.replace("until", "").trim();
+            loopStack.push({ type: "until", condition, commands: [] });
+        } else if (loopInfo.endsWith("times")) {
+            // Fixed iteration loop (repeat N times)
+            let iterations = parseInt(loopInfo.replace("times", "").trim(), 10);
+    
+            if (isNaN(iterations) || iterations < 1) {
+                outputElement.textContent += `Error: Invalid loop iteration count.\n`;
+                return;
+            }
+    
+            loopStack.push({ type: "times", iterations, commands: [] });
+        } else {
+            outputElement.textContent += `Error: Invalid loop syntax.\n`;
+        }
     }
     // Handle end of loop
     else if (command.startsWith("end loop")) {
         if (loopStack.length === 0) {
-            outputElement.textContent += `Error: 'end loop' without matching 'repeat loop until'.\n`;
+            outputElement.textContent += `Error: 'end loop' without matching 'repeat loop'.\n`;
             return;
         }
-
-        const loop = loopStack.pop();
-
-        while (true) {
-            // Replace variable names in the condition with their values
-            let conditionWithValues = loop.condition;
-            for (const key in variables) {
-                conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
+    
+        let loop = loopStack.pop();
+    
+        if (loop.type === "until") {
+            // Conditional loop execution
+            while (true) {
+                let conditionWithValues = loop.condition;
+                for (const key in variables) {
+                    conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
+                }
+    
+                if (eval(conditionWithValues)) break;
+                loop.commands.forEach(cmd => interpretCommand(cmd));
             }
-
-            // Evaluate the condition
-            if (eval(conditionWithValues)) break; // Stop the loop when the condition is true
-
-            // Execute the loop body
-            loop.commands.forEach(cmd => interpretCommand(cmd));
+        } else if (loop.type === "times") {
+            // Fixed iteration loop execution
+            for (let i = 1; i <= loop.iterations; i++) {
+                variables["counter"] = i; // Optionally store a counter
+                loop.commands.forEach(cmd => interpretCommand(cmd));
+            }
         }
     }
     // Store commands inside the loop
