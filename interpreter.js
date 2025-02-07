@@ -71,16 +71,20 @@ function interpretCommand(command) {
             outputElement.textContent += `Error: 'end loop' without matching 'repeat loop'.\n`;
             return;
         }
-
+    
         let loop = loopStack.pop();
-
+    
         if (loop.type === "until") {
             while (true) {
                 let conditionWithValues = loop.condition;
+    
+                // ✅ Replace single '=' with '==' for valid comparisons
+                conditionWithValues = conditionWithValues.replace(/([^=!<>])=([^=])/g, '$1==$2');
+    
                 for (const key in variables) {
                     conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
                 }
-
+    
                 if (eval(conditionWithValues)) break;
                 for (let cmd of loop.commands) {
                     interpretCommand(cmd);
@@ -88,14 +92,14 @@ function interpretCommand(command) {
             }
         } else if (loop.type === "times") {
             let prevCounter = variables.hasOwnProperty("counter") ? variables["counter"] : undefined;
-
+    
             for (let i = 1; i <= loop.iterations; i++) {
                 variables["counter"] = i;
                 for (let cmd of loop.commands) {
                     interpretCommand(cmd);
                 }
             }
-
+    
             if (prevCounter !== undefined) {
                 variables["counter"] = prevCounter;
             } else {
@@ -103,7 +107,6 @@ function interpretCommand(command) {
             }
         }
     }
-
     // Store commands inside loops
     else if (loopStack.length > 0) {
         loopStack[loopStack.length - 1].commands.push(command);
@@ -116,6 +119,9 @@ function interpretCommand(command) {
 
         try {
             let conditionWithValues = condition;
+
+            // ✅ Replace single '=' with '==' for valid comparisons in if conditions
+            conditionWithValues = conditionWithValues.replace(/([^=!<>])=([^=])/g, '$1==$2');
             for (const key in variables) {
                 conditionWithValues = conditionWithValues.replace(new RegExp(`\\b${key}\\b`, 'g'), variables[key]);
             }
@@ -160,6 +166,36 @@ function interpretCommand(command) {
 
     // Handle "output"
     else if (command.startsWith("output")) {
+        if (skipExecution) return;
+    
+        const argument = command.substring(7).trim(); // Extract text after "output"
+    
+        try {
+            let outputMessage = "";
+            let regex = /"([^"]*)"|([^,\s]+)/g; // Match quoted text or variables
+            let match;
+    
+            while ((match = regex.exec(argument)) !== null) {
+                if (match[1] !== undefined) {
+                    // ✅ Preserve quoted strings exactly
+                    outputMessage += match[1];
+                } else {
+                    // ✅ Replace variables with their values
+                    let variableName = match[2];
+                    outputMessage += variables.hasOwnProperty(variableName) ? variables[variableName] : variableName;
+                }
+    
+                outputMessage += " "; // Add space between parts
+            }
+    
+            outputElement.textContent += `${outputMessage.trim()}\n`;
+        } catch (e) {
+            outputElement.textContent += `Error processing output: ${e.message}\n`;
+        }
+    }
+
+     // Handle "display"
+    else if (command.startsWith("display")) {
         const argument = command.substring(7).trim();
         const components = argument.split(",").map(component => component.trim());
         const outputMessage = components
