@@ -50,8 +50,8 @@
 </head>
 <body>
     <h1>MTH1W: Pseudocode Interpreter</h1>
-    <p>by <a href="mailto:roxasm@tcdsb.org">Mark Roxas</a>. <i>Last updated: Feb-07-2025</i></p>
-    <p>This tool allows you to run code inputted using the same format and commands (see Glossary of commands below) as written in the pseudocode of the Grade 9 Provincal Assessment of Mathematics for MTH1W. 
+    <p>by <a href="mailto:roxasm@tcdsb.org">Mark Roxas</a>. <i>Last updated: Feb-08-2025</i></p>
+    <p>This tool allows you to run code inputted using the same format and commands (see Glossary of commands below) as written in the pseudocode of the Grade 9 Provincal Assessment of Mathematics and Ontario Curriculum Samples for MTH1W. 
     Please make sure javascript is enabled on your computer or mobile device. You will also find pseudocode samples from released assessment questions and sample tasks you can use to implement this tool. 
     For educational purposes only!</p>
     <textarea id="pseudocodeInput" placeholder="Enter your pseudocode here..."></textarea>
@@ -64,6 +64,7 @@
         <p><strong>set &lt;variable&gt; = &lt;value&gt;</strong>: Define a variable and assign it a value.</p>
         <p><strong>store user input as &lt;variable&gt;</strong>: Prompt the user to enter a value, then store it in the specified variable.</p>
         <p><strong>store input as &lt;variable&gt;</strong>: Prompt the user to enter a value, then store it in the specified variable.</p>
+        <p><strong>&lt;variable&gt; = input &lt;text&gt;</strong>: Prompt the user to enter a value, then store it in the specified variable.Text must be enclosed in double quotes ("").</p>
         <p><strong>output &lt;text&gt;, &lt;variable&gt;</strong>: Print a combination of text and variables. Text must be enclosed in double quotes ("").</p>
         <p><strong>display &lt;text&gt;, &lt;variable&gt;</strong>: Print a combination of text and variables. Text must be enclosed in double quotes ("").</p>
         <p><strong>if &lt;condition&gt;</strong>: Start a conditional block. The block executes only if the condition evaluates to true.</p>
@@ -85,7 +86,7 @@
         <tr>
             <td>
                 <pre>
-set number = 0 
+set number = 0
 output "Enter a number."
 store user input as number
 stepOne = number ^ 2
